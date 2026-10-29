@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Приглашение для Зайки</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Rubik:wght@400;500;700;800&family=PT+Mono&display=swap">
+<style>
+/* Layout: one centred "clay card" per step on a warm beige ground; steps swap in place. Single warm look by choice. */
+:root{
+  --bg:#e9dccb;          /* бежевый */
+  --paper:#f6eee3;
+  --ink:#1c1412;         /* чёрный */
+  --brown:#5a3a2a;       /* коричневый */
+  --wine:#7a1f24;        /* тёмно-красный */
+  --wine-soft:#a8484d;
+  --line:#cbb59c;
+  --good:#5a3a2a;
+  --display:"Rubik",system-ui,sans-serif;
+  --hand:"Caveat","Comic Sans MS",cursive;
+  --mono:"PT Mono",ui-monospace,"Courier New",monospace;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--display);
+  font-size:16px;
+  line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:24px 40px;
+  background-image:radial-gradient(circle at 20% 10%,rgba(122,31,36,.07),transparent 40%),
+                   radial-gradient(circle at 85% 90%,rgba(90,58,42,.10),transparent 45%);
+}
+.wrap{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+.top{display:flex;justify-content:space-between;align-items:center;color:var(--brown);font-family:var(--hand);font-size:1.5rem}
+.dots{display:flex;gap:6px}
+.dots span{width:9px;height:9px;border-radius:50%;background:var(--line);transition:background .3s}
+.dots span.on{background:var(--wine)}
+
+.card{
+  position:relative;
+  background:var(--paper);
+  border:1.5px solid var(--line);
+  border-radius:22px 26px 20px 28px;
+  padding:28px 22px;
+  box-shadow:0 2px 0 var(--line),0 14px 30px -18px rgba(28,20,18,.45);
+  overflow:hidden;
+}
+.screen{display:flex;flex-direction:column;gap:18px;animation:rise .45s ease both}
+@keyframes rise{from{transform:translateY(10px)}to{transform:none}}
+h1,h2{margin:0;font-weight:800;letter-spacing:-.01em;text-wrap:balance;color:var(--ink)}
+h1{font-size:clamp(1.9rem,6vw,2.5rem);line-height:1.1}
+h2{font-size:clamp(1.35rem,4.6vw,1.7rem);line-height:1.2}
+.hand{font-family:var(--hand);font-size:1.6rem;color:var(--wine);line-height:1.2}
+p{margin:0;color:var(--brown)}
+.eyebrow{font-size:.78rem;text-transform:uppercase;letter-spacing:.12em;color:var(--brown);font-weight:500}
+
+.btn{
+  font:inherit;font-weight:700;font-size:1.05rem;
+  background:var(--wine);color:var(--paper);
+  border:0;border-radius:999px;padding:14px 26px;cursor:pointer;
+  box-shadow:0 4px 0 #4e1216;transition:transform .12s,box-shadow .12s;
+  align-self:flex-start;
+}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #4e1216}
+.btn:focus-visible,.opt:focus-visible,.heart:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+
+/* quiz */
+.qnum{font-family:var(--mono);font-size:.85rem;color:var(--brown);font-variant-numeric:tabular-nums}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opt{
+  font:inherit;font-weight:500;text-align:left;
+  background:transparent;color:var(--ink);
+  border:1.5px solid var(--brown);border-radius:14px;
+  padding:13px 14px;cursor:pointer;min-width:0;
+  transition:background .15s,color .15s,transform .15s;
+}
+.opt:hover{background:#efe3d3}
+.opt.right{background:var(--good);border-color:var(--good);color:#fff}
+.opt.wrong{background:var(--wine);border-color:var(--wine);color:#fff;animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.feedback{min-height:2.2em;font-family:var(--hand);font-size:1.45rem;color:var(--wine);line-height:1.2}
+.feedback.ok{color:var(--good)}
+
+/* result */
+.badge{
+  display:flex;align-items:center;gap:12px;
+  background:var(--ink);color:var(--paper);border-radius:16px;padding:14px 16px;
+}
+.badge .count{
+  flex:none;width:30px;height:30px;border-radius:50%;background:var(--wine);
+  display:grid;place-items:center;font-weight:800;font-size:.95rem;
+  animation:pulse 1.4s ease-in-out infinite;
+}
+@keyframes pulse{50%{transform:scale(1.15)}}
+
+/* hearts hunt */
+.hunt{position:relative;min-height:340px}
+.hunt-text{position:relative;z-index:1;display:flex;flex-direction:column;gap:14px}
+.counter{font-family:var(--mono);font-size:1.1rem;color:var(--ink);font-variant-numeric:tabular-nums}
+.heart{
+  position:absolute;z-index:2;border:0;background:transparent;padding:6px;cursor:pointer;
+  color:var(--brown);opacity:.38;line-height:0;
+  transition:transform .2s,opacity .2s;
+}
+.heart svg{width:var(--s,20px);height:var(--s,20px);display:block}
+.heart:hover{opacity:.9}
+.heart.found{color:var(--brown);opacity:1;animation:pop .5s forwards;pointer-events:none}
+@keyframes pop{40%{transform:scale(1.8)}100%{transform:scale(1.2)}}
+.vase{position:absolute;right:6%;bottom:6%;width:110px;opacity:.9}
+.mug{position:absolute;left:4%;bottom:10%;width:90px;opacity:.9}
+
+/* letter */
+.envelope{
+  align-self:center;width:min(260px,80%);aspect-ratio:3/2;max-width:100%;
+  background:var(--wine);border-radius:10px;position:relative;cursor:pointer;border:0;
+  box-shadow:0 10px 22px -12px rgba(28,20,18,.6);
+}
+.envelope::before{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(to bottom right,transparent 49.5%,#64181c 50%) left/50% 100% no-repeat,
+             linear-gradient(to bottom left,transparent 49.5%,#64181c 50%) right/50% 100% no-repeat;
+  border-radius:10px;
+}
+.envelope .seal{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:46px;height:46px;border-radius:50%;background:var(--paper);color:var(--wine);
+  display:grid;place-items:center;font-family:var(--hand);font-size:1.6rem;font-weight:700;
+}
+.letter{
+  font-family:var(--mono);font-size:1rem;line-height:1.75;color:var(--ink);
+  white-space:pre-wrap;min-height:12em;
+  background:repeating-linear-gradient(to bottom,transparent 0 calc(1.75em - 1px),var(--line) calc(1.75em - 1px) 1.75em);
+}
+.caret{display:inline-block;width:.55em;height:1.1em;background:var(--wine);vertical-align:-.15em;animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+.skip{font:inherit;font-size:.85rem;background:none;border:0;color:var(--brown);text-decoration:underline;cursor:pointer;align-self:flex-start;padding:0}
+
+/* plan */
+.steps{display:flex;flex-direction:column;gap:12px;list-style:none;margin:0;padding:0}
+.step{
+  display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:start;
+  padding:14px;border-radius:16px;background:#efe3d3;
+  opacity:0;transform:translateY(8px);transition:opacity .6s,transform .6s;
+}
+.step.show{opacity:1;transform:none}
+.step .ico{width:44px;height:44px;border-radius:12px;background:var(--ink);color:var(--paper);display:grid;place-items:center;font-size:1.3rem}
+.step .time{font-family:var(--mono);font-size:.8rem;color:var(--wine)}
+.step h3{margin:0;font-size:1.08rem;font-weight:700}
+.step p{font-size:.95rem}
+
+.countdown{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.cell{background:var(--ink);color:var(--paper);border-radius:14px;padding:12px 4px;text-align:center}
+.cell b{display:block;font-family:var(--mono);font-size:clamp(1.5rem,7vw,2.1rem);font-weight:400;font-variant-numeric:tabular-nums;line-height:1.1}
+.cell span{font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;opacity:.75}
+.today{font-family:var(--hand);font-size:2.2rem;color:var(--wine);text-align:center;line-height:1.1}
+.when{font-family:var(--mono);color:var(--brown);font-size:.9rem}
+
+.floaty{position:fixed;pointer-events:none;z-index:50;color:var(--brown);font-size:22px;animation:fly 1.2s ease-out forwards}
+@keyframes fly{to{transform:translateY(-120px) scale(1.4);opacity:0}}
+
+.rests{display:flex;flex-direction:column;gap:12px}
+.rest{display:grid;grid-template-columns:72px 1fr;gap:14px;align-items:center;text-align:left;
+  font:inherit;color:var(--ink);background:transparent;border:1.5px solid var(--line);border-radius:18px;padding:12px;cursor:pointer;
+  transition:border-color .15s,background .15s,transform .15s}
+.rest:hover{border-color:var(--brown);background:#efe3d3}
+.rest.picked{border-color:var(--wine);background:#f1dcd6;transform:scale(1.01)}
+.rest .pic{width:72px;height:72px;border-radius:14px;display:grid;place-items:center;font-size:2.1rem;background:var(--ink)}
+.rest:nth-child(2) .pic{background:var(--wine)}
+.rest:nth-child(3) .pic{background:var(--brown)}
+.rest h3{margin:0;font-size:1.05rem;font-weight:700}
+.rest .meta{font-family:var(--mono);font-size:.78rem;color:var(--wine)}
+.rest p{font-size:.9rem}
+.rlink{font-size:.85rem;color:var(--brown)}
+.links{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:4px}
+.tg{display:inline-flex;align-items:center;gap:8px;text-decoration:none;align-self:flex-start}
+.small{font-size:.85rem}
+@media (max-width:420px){.opts{grid-template-columns:1fr}.card{padding:24px 16px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.step{opacity:1;transform:none}}
+</style>
+<style>
+html{color-scheme:light}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><span>для Мики 🐭</span><div class="dots" id="dots"><span></span><span></span><span></span><span></span><span></span></div></div>
+  <main class="card" id="card"></main>
+</div>
+
+<script>
+/* ============ TELEGRAM — вставь сюда данные своего бота ============ */
+const TELEGRAM = {
+  token: "9208226268:AAFOsJtYDGqcVw6GQkXFl-IRRmsEGF82hMw",
+  chatId: "6237380979"
+};
+function notify(text){
+  if (!TELEGRAM.token || !TELEGRAM.chatId) return;   // пока пусто — ничего не отправляется
+  const body = new URLSearchParams({ chat_id: TELEGRAM.chatId, text: "💌 " + text });
+  fetch("https://api.telegram.org/bot" + TELEGRAM.token + "/sendMessage", { method: "POST", body, mode: "no-cors" }).catch(()=>{});
+}
+
+/* ============ НАСТРОЙКИ — меняй тут ============ */
+const CONFIG = {
+  // Дата и время свидания (временная — поменяй, когда студия ответит)
+  date: "2026-11-29T14:00:00",
+  pottery: { title: "Лепим свои кружки", place: "CeramicsOnWheels, Dörflistrasse 50, Цюрих", note: "Сделаем кружки с нуля, своими руками" },
+  restaurant: { title: "Ужин в ресторане", note: "Где — выбираешь ты 😉", time: "около 17:00" },
+  // Варианты ресторанов, из которых он выбирает
+  restaurants: [
+    { name:"Miss Miu", emoji:"🍜", kind:"Азиатская кухня · 4.7 ★", text:"Хрустящая курица, пад-тай и очень красивая подача.",
+      site:"https://www.miss-miu.ch/de/zuerich-badenerstrasse", map:"https://maps.google.com/?cid=14077974680204936822", address:"Badenerstrasse 97, Цюрих" },
+    { name:"Nooch Asian Kitchen", emoji:"🥢", kind:"Лапша, вок, суши · 4.6 ★", text:"Уютно, открытая кухня — видно, как готовят.",
+      site:"https://www.nooch.ch/de/zuerich-steinfels", map:"https://maps.google.com/?cid=12392203079724103332", address:"Heinrichstrasse 267, Цюрих" },
+    { name:"Anemoia", emoji:"🍕", kind:"Итальянская · 4.6 ★", text:"Неаполитанская пицца и сырная паста.",
+      site:"https://www.anemoia.ch/", map:"https://maps.google.com/?cid=4250289947851727084", address:"Fabrikstrasse 23, Цюрих" }
+  ],
+  bring: "Одежду, которую не жалко испачкать глиной 🤎",
+  letter:
+`Зайка,
+
+ты прошёл тест — значит, ты правда меня знаешь 🤍
+
+Наше первое свидание ещё впереди.
+И я хочу, чтобы оно было особенным:
+чтобы мы сделали что-то своими руками,
+а потом каждое утро пили кофе
+из кружек, которые слепили вместе.
+
+А после — вкусный ужин, только мы вдвоём.
+
+Пойдёшь со мной? 😊`
+};
+
+const QUIZ = [
+  { q:"Где мы познакомились?",
+    opts:[["В Дайвинчике",1],["В самолёте",0],["В Маке",0],["В баре",0]],
+    no:["Серьёзно?? 😤 Попробуй ещё","Я сейчас обижусь 🙄"] },
+  { q:"Какой мой любимый цвет?",
+    opts:[["Чёрный",1],["Бежевый",1],["Тёмно-красный",1],["Коричневый",1],["Розовый",0],["Неоновый салатовый",0]],
+    no:["Ты вообще видел мой гардероб? 👀","Мимо! Подсказка: ничего яркого"] },
+  { q:"Что я всегда заказываю?",
+    opts:[["Боул",1],["Сыр с пастой",1],["Бургер",0],["Только воду",0]],
+    no:["Мы точно знакомы? 🤨","Нееет, попробуй ещё 🍝"] },
+  { q:"Каким было наше первое свидание?",
+    opts:[["Оно ещё впереди 👀",1],["Мак",0],["Кино",0],["Прогулка по городу",0]],
+    no:{"Мак":"Мак?? Серьёзно?? 🍟😤"},
+    noDefault:["Хм… ты точно ничего не путаешь? 😏","Подумай ещё 😉"] },
+  { q:"Без чего я не могу прожить и дня?",
+    opts:[["ТикТок",0],["Телеграм",0],["Сладкое",0],["Крем для рук",1]],
+    no:["Почти… но нет 😅","Неправильно! Я без этого правда не могу, но нет 🙈","Подумай о моих руках 👐"] },
+  { q:"Как я тебя называю?",
+    opts:[["Зайка моя любимая",1],["Коть",1],["Никитааааааа",1],["По фамилии",0]],
+    no:["Чтооо? 😂 Никогда!","Я тебя так не называю! 😤"] }
+];
+/* =============================================== */
+
+const card = document.getElementById("card");
+const LOG = { mistakes: [], hearts: 0, restaurant: null };
+const dots = [...document.querySelectorAll("#dots span")];
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const heartSVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 21s-7.5-4.6-9.6-9.2C.9 8.6 2.9 5 6.4 5c2.2 0 3.5 1.2 4.4 2.5C11.7 6.2 13 5 15.2 5c3.5 0 5.5 3.6 4 6.8C19.5 16.4 12 21 12 21z"/></svg>';
+
+/* Каждый экран получает свой номер. Таймеры от старого экрана
+   просто ничего не делают, если экран уже сменился — так ничего не «скипается». */
+let screen = 0;
+let cdTimer = null;
+function later(fn, ms){ const s = screen; setTimeout(() => { if (s === screen) fn(); }, ms); }
+
+function setStage(n){ dots.forEach((d,i)=>d.classList.toggle("on", i<=n)); }
+function show(html){
+  screen++;
+  clearInterval(cdTimer);
+  card.innerHTML = '<section class="screen">'+html+'</section>';
+  card.querySelector(".btn,.envelope")?.focus({preventScroll:true});
+}
+function burst(x,y,n=6){
+  if(reduce) return;
+  for(let i=0;i<n;i++){
+    const s=document.createElement("span"); s.className="floaty"; s.textContent=["🤎","♥"][i%2];
+    s.style.left=(x+(Math.random()*60-30))+"px"; s.style.top=(y+(Math.random()*20-10))+"px";
+    s.style.animationDelay=(i*60)+"ms"; document.body.appendChild(s); setTimeout(()=>s.remove(),1500);
+  }
+}
+/* кнопка срабатывает только один раз */
+function once(el, fn){ let used=false; el.onclick = e => { if(used) return; used=true; fn(e); }; }
+
+/* 0. Старт */
+function start(){
+  setStage(0);
+  show(`
+    <span class="eyebrow">Секретное сообщение</span>
+    <h1>Привет, Зайка 🤍</h1>
+    <p>У меня для тебя кое-что есть. Но сначала проверим, как хорошо ты меня знаешь.</p>
+    <p class="hand">6 вопросов. Ошибаться можно, но я всё вижу 👀</p>
+    <button class="btn" id="go">Начать тест</button>`);
+  notify("Он открыл сайт 👀");
+  once(document.getElementById("go"), ()=>{ notify("Начал тест 🧠"); quiz(0); });
+}
+
+/* 1. Квиз — дальше только когда выбраны ВСЕ правильные ответы */
+function quiz(i){
+  setStage(1);
+  const d = QUIZ[i];
+  const need = d.opts.filter(o=>o[1]).length;
+  const multi = need > 1;
+  let got = 0, tries = 0, finished = false;
+  show(`
+    <span class="qnum">Вопрос ${i+1} из ${QUIZ.length}</span>
+    <h2>${d.q}</h2>
+    ${multi?`<p class="hand" style="font-size:1.3rem">Правильных ответов несколько — найди все 😉</p>`:''}
+    <div class="opts">${d.opts.map((o,k)=>`<button class="opt" data-k="${k}">${o[0]}</button>`).join("")}</div>
+    <div class="feedback" id="fb" aria-live="polite"></div>`);
+  const fb = document.getElementById("fb");
+  const buttons = [...card.querySelectorAll(".opt")];
+
+  buttons.forEach(b=>{
+    b.onclick = () => {
+      if (finished || b.classList.contains("right")) return;
+      const [label, right] = d.opts[+b.dataset.k];
+
+      if (right){
+        b.classList.add("right");
+        got++;
+        notify(`Вопрос ${i+1}: ✅ «${label}»`);
+        const r=b.getBoundingClientRect(); burst(r.left+r.width/2,r.top);
+        fb.className = "feedback ok";
+        if (got === need){
+          finished = true;
+          buttons.forEach(x=>x.disabled=true);
+          fb.textContent = multi ? "GOOOD boy 🎉" : "GOOOD boy 🤎";
+          later(()=> i+1<QUIZ.length ? quiz(i+1) : result(), 1200);
+        } else {
+          fb.textContent = `GOOOD boy 🤎 Осталось найти: ${need-got}`;
+        }
+      } else {
+        b.classList.remove("wrong"); void b.offsetWidth; b.classList.add("wrong");
+        let msg;
+        if (d.no && !Array.isArray(d.no) && d.no[label]) msg = d.no[label];
+        else { const list = Array.isArray(d.no) ? d.no : d.noDefault; msg = list[tries % list.length]; }
+        tries++; LOG.mistakes.push(`${i+1}. «${label}»`);
+        notify(`Вопрос ${i+1}: ❌ «${label}»`);
+        fb.className = "feedback"; fb.textContent = msg;
+        setTimeout(()=>b.classList.remove("wrong"), 600);
+      }
+    };
+  });
+}
+
+/* 2. Результат */
+function result(){
+  setStage(2);
+  show(`
+    <span class="eyebrow">Тест пройден</span>
+    <h1>Ты прошёл! 🎉</h1>
+    <p>Я знала, что ты справишься.</p>
+    <div class="badge"><span class="count">1</span><span>У тебя есть одно непрочитанное сообщение 💌</span></div>
+    <button class="btn" id="open">Открыть сообщение</button>`);
+  notify(`Тест пройден! Ошибок: ${LOG.mistakes.length} 🎉`);
+  once(document.getElementById("open"), hunt);
+}
+
+/* 3. Найди 5 сердечек */
+function hunt(){
+  setStage(3);
+  const spots=[
+    "left:calc(4% + 22px);bottom:calc(10% + 18px);--s:13px",            /* на кружке */
+    "right:calc(6% + 40px);bottom:calc(6% + 22px);--s:13px",            /* на вазе */
+    "top:-4px;right:-4px;--s:10px",                                       /* в углу */
+    "top:47%;left:91%;--s:10px",                                          /* сбоку */
+    "bottom:-2px;left:46%;--s:11px"                                       /* внизу */
+  ];
+  show(`
+    <div class="hunt" id="hunt">
+      <div class="hunt-text">
+        <span class="eyebrow">Почти…</span>
+        <h2>Сообщение спрятано 🔒</h2>
+        <p>Чтобы его открыть, найди на этой карточке 5 сердечек. Они очень маленькие и хорошо прячутся 👀 Посмотри даже на кружке и в самых углах.</p>
+        <div class="counter" id="cnt">Найдено: 0 / 5</div>
+      </div>
+      <svg class="mug" viewBox="0 0 90 80" aria-hidden="true"><path d="M10 14h52v40a18 18 0 0 1-18 18H28A18 18 0 0 1 10 54z" fill="#5a3a2a"/><path d="M62 24h8a12 12 0 0 1 0 24h-8" fill="none" stroke="#5a3a2a" stroke-width="7"/><path d="M28 6c0 4 4 4 4 8M40 4c0 4 4 4 4 8" stroke="#cbb59c" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+      <svg class="vase" viewBox="0 0 110 120" aria-hidden="true"><path d="M40 8h30v14c0 8 26 22 26 50 0 26-18 40-41 40S14 98 14 72c0-28 26-42 26-50z" fill="#1c1412"/><path d="M22 70c20 8 46 8 66 0" stroke="#7a1f24" stroke-width="5" fill="none"/></svg>
+      ${spots.map((p,k)=>`<button class="heart" aria-label="Сердечко" style="${p}" data-k="${k}">${heartSVG}</button>`).join("")}
+    </div>`);
+  let found = 0;
+  const cnt = document.getElementById("cnt");
+  card.querySelectorAll(".heart").forEach(h=>{
+    once(h, ()=>{
+      h.classList.add("found"); found++;
+      const r=h.getBoundingClientRect(); burst(r.left,r.top,4);
+      cnt.textContent = `Найдено: ${found} / 5` + (found===5 ? " ✨" : "");
+      notify(`Нашёл сердечко ${found}/5 🤎`);
+      if (found === 5) later(letter, 900);
+    });
+  });
+}
+
+/* 4. Письмо */
+function letter(){
+  setStage(3);
+  show(`
+    <span class="eyebrow">Новое сообщение</span>
+    <h2>Нажми на конверт</h2>
+    <button class="envelope" id="env" aria-label="Открыть письмо"><span class="seal">Д</span></button>`);
+  once(document.getElementById("env"), ()=>{ notify("Открыл конверт 💌"); typeLetter(); });
+}
+function typeLetter(){
+  show(`
+    <div class="letter" id="txt"></div>
+    <button class="skip" id="skip">Показать всё сразу</button>
+    <button class="btn" id="next" hidden>Да! А что мы будем делать? ✨</button>`);
+  const box=document.getElementById("txt"), next=document.getElementById("next"), skip=document.getElementById("skip");
+  const text = CONFIG.letter;
+  let i = 0, ended = false;
+  const done = () => {
+    if (ended) return; ended = true;
+    box.textContent = text; skip.hidden = true; next.hidden = false; next.focus({preventScroll:true});
+  };
+  const tick = () => {
+    if (ended) return;
+    i++;
+    box.textContent = text.slice(0,i);
+    const c=document.createElement("span"); c.className="caret"; box.appendChild(c);
+    if (i < text.length){ const ch=text[i-1]; later(tick, ch==="\n"?260:(".,!?".includes(ch)?180:45)); }
+    else done();
+  };
+  if (reduce) done(); else tick();
+  skip.onclick = done;
+  once(next, ()=>{ const r=next.getBoundingClientRect(); burst(r.left+r.width/2,r.top,10); notify("Прочитал письмо и нажал «Да!» 🥰"); restaurant(); });
+}
+
+/* 5. Выбор ресторана */
+function restaurant(){
+  setStage(4);
+  const R = CONFIG.restaurants;
+  show(`
+    <span class="eyebrow">После гончарной</span>
+    <h2>Где будем ужинать? 🍽️</h2>
+    <p>Выбери сам — я согласна на любой 🤎</p>
+    <div class="rests">${R.map((r,k)=>`
+      <div>
+        <button class="rest" data-k="${k}">
+          <div class="pic" aria-hidden="true">${r.emoji}</div>
+          <div><h3>${r.name}</h3><div class="meta">${r.kind}</div><p>${r.text}</p></div>
+        </button>
+        <div class="links"><a class="rlink" href="${r.site}" target="_blank" rel="noopener">Меню и фото ↗</a><a class="rlink" href="${r.map}" target="_blank" rel="noopener">На карте ↗</a></div>
+      </div>`).join("")}
+    </div>
+    <button class="btn" id="pick" hidden>Выбираю этот ✨</button>`);
+  const pick = document.getElementById("pick");
+  card.querySelectorAll(".rest").forEach(b=>{
+    b.onclick = () => {
+      card.querySelectorAll(".rest").forEach(x=>x.classList.remove("picked"));
+      b.classList.add("picked");
+      LOG.restaurant = R[+b.dataset.k];
+      notify(`Смотрит ресторан: ${LOG.restaurant.name}`);
+      pick.hidden = false;
+    };
+  });
+  once(pick, ()=>{ const r=pick.getBoundingClientRect(); burst(r.left+r.width/2,r.top,8); notify(`ВЫБРАЛ ресторан: ${LOG.restaurant.name} ${LOG.restaurant.emoji}`); plan(); });
+}
+
+function tgText(){
+  const r = LOG.restaurant;
+  return [
+    "Я прошёл твой тест! 🎉",
+    LOG.mistakes.length ? `Ошибок: ${LOG.mistakes.length} (${LOG.mistakes.join(", ")}) 🙈` : "Без единой ошибки 😎",
+    "Нашёл все 5 сердечек 🤎",
+    "Прочитал письмо — и да, я иду! 🏺",
+    r ? `На ужин выбираю: ${r.name} ${r.emoji}` : ""
+  ].filter(Boolean).join("\n");
+}
+
+/* 6. План + обратный отсчёт */
+function plan(){
+  setStage(4);
+  const d = new Date(CONFIG.date);
+  const dateStr = d.toLocaleDateString("ru-RU",{weekday:"long",day:"numeric",month:"long"});
+  const timeStr = d.toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"});
+  show(`
+    <span class="eyebrow">Наше первое свидание</span>
+    <h1>Вот что нас ждёт 🤎</h1>
+    <p class="when">${dateStr}, ${timeStr}</p>
+    <ol class="steps">
+      <li class="step"><div class="ico">🏺</div><div><div class="time">Сначала</div><h3>${CONFIG.pottery.title}</h3><p>${CONFIG.pottery.note}<br>${CONFIG.pottery.place}</p></div></li>
+      <li class="step"><div class="ico">${LOG.restaurant?LOG.restaurant.emoji:"🍝"}</div><div><div class="time">Потом, ${CONFIG.restaurant.time}</div><h3>${LOG.restaurant?"Ужин в "+LOG.restaurant.name:CONFIG.restaurant.title}</h3><p>${LOG.restaurant?LOG.restaurant.address:CONFIG.restaurant.note}</p></div></li>
+      <li class="step"><div class="ico">🧥</div><div><div class="time">Взять с собой</div><h3>Что надеть</h3><p>${CONFIG.bring}</p></div></li>
+    </ol>
+    <div id="cd"></div>`);
+  card.querySelectorAll(".step").forEach((s,k)=>later(()=>s.classList.add("show"), reduce?0:500+k*900));
+  const cd = document.getElementById("cd");
+  later(()=>countdown(cd,d), reduce?0:500+3*900);
+}
+function countdown(el,target){
+  const sameDay=(a,b)=>a.toDateString()===b.toDateString();
+  const p=n=>String(n).padStart(2,"0");
+  const draw=()=>{
+    const now=new Date(), ms=target-now;
+    if(sameDay(now,target)){ el.innerHTML='<div class="today">Сегодня тот самый день! 💛</div>'; return; }
+    if(ms<=0){ el.innerHTML='<div class="today">Мы это сделали! 💛</div>'; return; }
+    const s=Math.floor(ms/1000), dd=Math.floor(s/86400), hh=Math.floor(s%86400/3600), mm=Math.floor(s%3600/60), ss=s%60;
+    el.innerHTML=`<p class="eyebrow" style="margin-bottom:8px">До свидания осталось</p>
+      <div class="countdown">
+        <div class="cell"><b>${dd}</b><span>дней</span></div>
+        <div class="cell"><b>${p(hh)}</b><span>часов</span></div>
+        <div class="cell"><b>${p(mm)}</b><span>минут</span></div>
+        <div class="cell"><b>${p(ss)}</b><span>секунд</span></div>
+      </div>`;
+  };
+  clearInterval(cdTimer);
+  draw(); cdTimer = setInterval(draw,1000);
+}
+
+start();
+</script>
+
+</body>
+</html>
