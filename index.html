@@ -228,19 +228,16 @@ const CONFIG = {
   ],
   bring: "Одежду, которую не жалко испачкать глиной 🤎",
   letter:
-`Зайка,
+`Никита,
 
-ты прошёл тест — значит, ты правда меня знаешь 🤍
-
-Наше первое свидание ещё впереди.
-И я хочу, чтобы оно было особенным:
-чтобы мы сделали что-то своими руками,
-а потом каждое утро пили кофе
-из кружек, которые слепили вместе.
-
-А после — вкусный ужин, только мы вдвоём.
-
-Пойдёшь со мной? 😊`
+ну всё, тест ты прошёл — значит, правда меня знаешь 🤎
+(или просто угадывал, но я сделаю вид, что не заметила аххах)
+Я приглашаю тебя на свидание.
+Мы будем лепить свои кружки из глины или что угодно 🏺
+Да, ты испачкаешься. Да, это обязательно.
+А через месяц будем пить из них кофе или матчу ахах
+и вспоминать, как у тебя всё развалилось 😂
+А потом — ужин. Я подготовила пару вариантов, тебе только выбрать)`
 };
 
 const QUIZ = [
@@ -301,10 +298,10 @@ function start(){
   setStage(0);
   show(`
     <span class="eyebrow">Секретное сообщение</span>
-    <h1>Привет, Зайка 🤍</h1>
-    <p>У меня для тебя кое-что есть. Но сначала проверим, как хорошо ты меня знаешь.</p>
-    <p class="hand">6 вопросов. Ошибаться можно, но я всё вижу 👀</p>
-    <button class="btn" id="go">Начать тест</button>`);
+    <h1>Никитааааааа 👀</h1>
+    <p>Думал, просто откроешь и всё узнаешь аххах?</p>
+    <p class="hand">Сначала тест, а ты шо думал 😂</p>
+    <button class="btn" id="go">Ну давай</button>`);
   notify("Он открыл сайт 👀");
   once(document.getElementById("go"), ()=>{ notify("Начал тест 🧠"); quiz(0); });
 }
@@ -419,7 +416,7 @@ function typeLetter(){
   show(`
     <div class="letter" id="txt"></div>
     <button class="skip" id="skip">Показать всё сразу</button>
-    <button class="btn" id="next" hidden>Да! А что мы будем делать? ✨</button>`);
+    <button class="btn" id="next" hidden>Показывай варианты 😋</button>`);
   const box=document.getElementById("txt"), next=document.getElementById("next"), skip=document.getElementById("skip");
   const text = CONFIG.letter;
   let i = 0, ended = false;
@@ -437,7 +434,7 @@ function typeLetter(){
   };
   if (reduce) done(); else tick();
   skip.onclick = done;
-  once(next, ()=>{ const r=next.getBoundingClientRect(); burst(r.left+r.width/2,r.top,10); notify("Прочитал письмо и нажал «Да!» 🥰"); restaurant(); });
+  once(next, ()=>{ const r=next.getBoundingClientRect(); burst(r.left+r.width/2,r.top,10); notify("Прочитал письмо 🥰 Смотрит рестораны…"); restaurant(); });
 }
 
 /* 5. Выбор ресторана */
